@@ -36,6 +36,7 @@ subprojects {
     apply plugin: 'org.graalvm.buildtools.native'
     apply plugin: "pl.allegro.tech.build.axion-release"
 
+    project.group = rootProject.group
     project.version = rootProject.version
 
     repositories {
