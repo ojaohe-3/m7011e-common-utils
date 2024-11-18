@@ -1,0 +1,134 @@
+plugins {
+    id 'java-library'
+    id 'groovy'
+    id 'maven-publish'
+    id 'org.springframework.boot' version '3.3.5'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'org.graalvm.buildtools.native' version '0.10.3'
+    id "pl.allegro.tech.build.axion-release" version "1.18.7"
+}
+
+ext {
+    springCloudVersion = "2023.0.3"
+}
+
+scmVersion {
+    versionIncrementer('incrementPatch')
+    ignoreUncommittedChanges.set(false)
+    tag {
+        versionIncrementer('incrementPatch')
+        prefix.set('v.')
+
+    }
+}
+
+group = 'm7011e.the-homeric-odyssey'
+project.version = scmVersion.version
+
+allprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'groovy'
+    apply plugin: 'maven-publish'
+
+    project.version = rootProject.version
+
+    repositories {
+        mavenCentral()
+        maven {
+            url("${reposiliteUrl}/snapshots")
+            name "Reposilite"
+            credentials(PasswordCredentials) {
+                username = reposiliteUser
+                password = reposiliteSecret
+            }
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
+        maven {
+            url("${reposiliteUrl}/releases")
+            name "Reposilite"
+            credentials(PasswordCredentials) {
+                username = reposiliteUser
+                password = reposiliteSecret
+            }
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
+    }
+
+    publishing {
+        repositories {
+            maven {
+                if (project.version.toString().endsWith('-SNAPSHOT')) {
+                    url("${reposiliteUrl}/snapshots")
+                } else {
+                    url("${reposiliteUrl}/releases")
+                }
+                name "Reposilite"
+                credentials(PasswordCredentials) {
+                    username = reposiliteUser
+                    password = reposiliteSecret
+                }
+                authentication {
+                    basic(BasicAuthentication)
+                }
+            }
+        }
+        publications {
+
+            maven(MavenPublication) {
+                groupId = group
+                version = version
+                from components.java
+            }
+        }
+
+    }
+}
+
+subprojects {
+    version = rootProject.version
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+
+
+
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+    implementation 'org.springframework.cloud:spring-cloud-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.session:spring-session-core'
+    implementation 'org.springframework.boot:spring-boot-starter-web-services'
+    compileOnly 'org.projectlombok:lombok'
+    compileOnly group: 'org.springframework.boot', name: 'spring-boot-dependencies', version: '3.3.5', ext: 'pom'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
