@@ -1,2 +1,4 @@
 rootProject.name = 'common-utils'
-include "exception-handling"
+include "resource-server"
+include 'authentication-components'
+

@@ -1,0 +1,7 @@
+security:
+  authentication:
+    url: ${AUTH_SERVER_URL:http:localhost:8080/auth/login}
+    client-id: ${KEYCLOAK_CLIENT_ID:auth-server-client}
+    system-user:
+      username: ${SYSTEM_USERNAME:system-user}
+      password: ${SYSTEM_PASSWORD:system-password}

@@ -9,7 +9,6 @@ plugins {
 }
 
 
-
 scmVersion {
     versionIncrementer('incrementPatch')
     ignoreUncommittedChanges.set(false)
@@ -23,6 +22,12 @@ scmVersion {
 group = 'm7011e.the-homeric-odyssey'
 project.version = scmVersion.version
 
+subprojects.each {
+    check.dependsOn("${it.name}:check")
+    publish.dependsOn("${it.name}:publish")
+    assemble.dependsOn("${it.name}:assemble")
+}
+
 subprojects {
     ext {
         springCloudVersion = "2023.0.3"
@@ -34,10 +39,52 @@ subprojects {
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
     apply plugin: 'org.graalvm.buildtools.native'
-    apply plugin: "pl.allegro.tech.build.axion-release"
 
     project.group = rootProject.group
     project.version = rootProject.version
+
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter'
+        implementation 'org.springframework.boot:spring-boot-starter-security'
+        implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+        implementation 'org.springframework.cloud:spring-cloud-starter'
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.session:spring-session-core'
+        implementation 'org.springframework.boot:spring-boot-starter-web-services'
+        implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+        implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+        implementation 'org.apache.commons:commons-lang3:3.17.0'
+
+        compileOnly 'org.projectlombok:lombok'
+        compileOnly group: 'org.springframework.boot', name: 'spring-boot-dependencies', version: '3.3.5', ext: 'pom'
+        annotationProcessor 'org.projectlombok:lombok'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
+        }
+    }
+
+    bootJar {
+        enabled = false
+    }
+
+    jar {
+        enabled=true
+    }
+
+    tasks.named('processAot') {
+        enabled = false
+    }
+}
+
+allprojects {
+    version = rootProject.version
+
+    apply plugin: 'maven-publish'
 
     repositories {
         mavenCentral()
@@ -65,6 +112,11 @@ subprojects {
         }
     }
 
+    tasks.register('sourceJar', org.gradle.jvm.tasks.Jar) {
+        from sourceSets.main.allJava
+        archiveClassifier = "sources"
+    }
+
     publishing {
         repositories {
             maven {
@@ -86,42 +138,11 @@ subprojects {
         publications {
 
             maven(MavenPublication) {
-                groupId = group
-                version = version
                 from components.java
+                artifact sourceJar
             }
         }
-
     }
-
-    dependencies {
-        implementation 'org.springframework.boot:spring-boot-starter'
-        implementation 'org.springframework.boot:spring-boot-starter-data-rest'
-        implementation 'org.springframework.cloud:spring-cloud-starter'
-        implementation 'org.springframework.boot:spring-boot-starter-web'
-        implementation 'org.springframework.session:spring-session-core'
-        implementation 'org.springframework.boot:spring-boot-starter-web-services'
-        compileOnly 'org.projectlombok:lombok'
-        compileOnly group: 'org.springframework.boot', name: 'spring-boot-dependencies', version: '3.3.5', ext: 'pom'
-        annotationProcessor 'org.projectlombok:lombok'
-        testImplementation 'org.springframework.boot:spring-boot-starter-test'
-        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    }
-
-    dependencyManagement {
-        imports {
-            mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
-        }
-    }
-
-    bootJar {
-        enabled = false
-    }
-
-    tasks.named('processAot') {
-        enabled = false
-    }
-
 }
 
 tasks.named('test') {
@@ -133,9 +154,6 @@ graalvmNative {
     testSupport = false
 }
 
-
-
-tasks.register('exception-handling')
 
 java {
     toolchain {
