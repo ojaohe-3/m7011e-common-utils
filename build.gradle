@@ -83,8 +83,14 @@ subprojects {
 
 allprojects {
     version = rootProject.version
-
+    group = rootProject.group
     apply plugin: 'maven-publish'
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
 
     repositories {
         mavenCentral()
@@ -120,7 +126,7 @@ allprojects {
     publishing {
         repositories {
             maven {
-                if (project.version.toString().endsWith('-SNAPSHOT')) {
+                if (project.version.toString().contains('-SNAPSHOT')) {
                     url("${reposiliteUrl}/snapshots")
                 } else {
                     url("${reposiliteUrl}/releases")
@@ -154,12 +160,6 @@ graalvmNative {
     testSupport = false
 }
 
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
 
 configurations {
     compileOnly {
