@@ -1,4 +1,5 @@
 rootProject.name = 'common-utils'
 include "resource-server"
 include 'authentication-components'
+include 'common-dependencies'
 

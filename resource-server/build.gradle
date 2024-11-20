@@ -1,1 +1,20 @@
 
+dependencies {
+    api 'org.springframework.boot:spring-boot-starter'
+    api 'org.springframework.boot:spring-boot-starter-security'
+    api 'org.springframework.boot:spring-boot-starter-data-rest'
+    api 'org.springframework.cloud:spring-cloud-starter'
+    api 'org.springframework.boot:spring-boot-starter-web'
+    api 'org.springframework.session:spring-session-core'
+    api 'org.springframework.boot:spring-boot-starter-web-services'
+    api 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    api 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    api 'org.apache.commons:commons-lang3:3.17.0'
+
+    compileOnly 'org.projectlombok:lombok'
+    compileOnly group: 'org.springframework.boot', name: 'spring-boot-dependencies', version: '3.3.5', ext: 'pom'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+}

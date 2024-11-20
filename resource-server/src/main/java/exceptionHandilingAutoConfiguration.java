@@ -7,5 +7,5 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @AutoConfiguration
 @EnableWebSecurity
 @BootstrapConfiguration
-public class ExceptionHandilingAutoConfiguration {
+public class exceptionHandilingAutoConfiguration {
 }
