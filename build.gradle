@@ -1,8 +1,8 @@
 buildscript {
     ext {
         springCloudVersion = "2023.0.3"
-        springbootVersion = '3.3.5'
-        springData = '3.4.0'
+        springBootVersion = '3.3.5'
+        springData = '2024.1.0'
         prometheusVersion = '1.14.1'
         commonsLang3 = '3.17.0'
         commonIo = '2.17.0'
@@ -33,7 +33,7 @@ scmVersion {
 }
 
 group = 'm7011e.the-homeric-odyssey'
-project.version = scmVersion.version
+project.version = scmVersion.version + '-1'
 
 subprojects.each {
     check.dependsOn("${it.name}:check")
@@ -111,7 +111,7 @@ configure(
     publishing {
         repositories {
             maven {
-                if (project.version.toString().endsWith('-SNAPSHOT')) {
+                if (project.version.toString().contains('-SNAPSHOT')) {
                     url("${reposiliteUrl}/snapshots")
                 } else {
                     url("${reposiliteUrl}/releases")
