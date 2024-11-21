@@ -33,7 +33,7 @@ scmVersion {
 }
 
 group = 'm7011e.the-homeric-odyssey'
-project.version = scmVersion.version + '3'
+project.version = scmVersion.version
 
 subprojects.each {
     check.dependsOn("${it.name}:check")
@@ -57,10 +57,6 @@ configure(
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
     apply plugin: 'org.graalvm.buildtools.native'
-
-
-    project.group = rootProject.group
-    project.version = rootProject.version
 
     configurations {
         compileOnly {
@@ -115,7 +111,7 @@ configure(
     publishing {
         repositories {
             maven {
-                if (project.version.toString().contains('-SNAPSHOT')) {
+                if (project.version.toString().endsWith('-SNAPSHOT')) {
                     url("${reposiliteUrl}/snapshots")
                 } else {
                     url("${reposiliteUrl}/releases")
@@ -141,7 +137,7 @@ configure(
 
 
 allprojects {
-    version = rootProject.version
+    project.version = rootProject.version
     group = rootProject.group
 
     apply plugin: 'maven-publish'
