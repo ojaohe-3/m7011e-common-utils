@@ -9,6 +9,7 @@ buildscript {
         modelMapper = '3.2.1'
         openApiSwagger = '2.1.6'
         commonValidation = '1.9.0'
+        lombokVerison = '1.18.36'
     }
 }
 
@@ -27,13 +28,14 @@ scmVersion {
     ignoreUncommittedChanges.set(false)
     tag {
         versionIncrementer('incrementPatch')
-        prefix.set('v.')
+
+        prefix.set('v')
 
     }
 }
 
 group = 'm7011e.the-homeric-odyssey'
-project.version = scmVersion.version + '-1'
+project.version = scmVersion.version + '13'
 
 subprojects.each {
     check.dependsOn("${it.name}:check")
@@ -66,13 +68,23 @@ configure(
 
 
     dependencies {
+        api(group: 'org.springframework.boot', name: 'spring-boot-dependencies', version: springBootVersion)
+        api(group: 'org.springframework.data', name: 'spring-data-bom', version: springData, ext: 'pom')
+        api(group: 'org.springframework.cloud', name: 'spring-cloud-dependencies', version: springCloudVersion)
+        api(group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: prometheusVersion)
+        api(group: 'org.apache.commons', name: 'commons-lang3', version: commonsLang3)
+        api(group: 'commons-io', name: 'commons-io', version: commonIo)
+        api(group: 'org.modelmapper', name: 'modelmapper', version: modelMapper)
+        api(group: 'io.openapitools.swagger', name: 'swagger-maven-plugin', version: openApiSwagger)
+        api(group: 'commons-validator', name: 'commons-validator', version: commonValidation)
+        api(group: 'org.projectlombok', name: 'lombok', version: lombokVerison)
+
         implementation 'org.springframework.boot:spring-boot-starter'
         implementation 'org.springframework.boot:spring-boot-starter-security'
         implementation 'org.springframework.boot:spring-boot-starter-data-rest'
-        implementation 'org.springframework.cloud:spring-cloud-starter'
         implementation 'org.springframework.boot:spring-boot-starter-web'
-        implementation 'org.springframework.session:spring-session-core'
-        implementation 'org.springframework.boot:spring-boot-starter-web-services'
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
         implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
         implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
         implementation 'org.apache.commons:commons-lang3:3.17.0'
@@ -111,6 +123,7 @@ configure(
     publishing {
         repositories {
             maven {
+                allowInsecureProtocol = true
                 if (project.version.toString().contains('-SNAPSHOT')) {
                     url("${reposiliteUrl}/snapshots")
                 } else {
@@ -151,6 +164,7 @@ allprojects {
     repositories {
         mavenCentral()
         maven {
+            allowInsecureProtocol = true
             url("${reposiliteUrl}/snapshots")
             name "Reposilite"
             credentials(PasswordCredentials) {
@@ -162,6 +176,7 @@ allprojects {
             }
         }
         maven {
+            allowInsecureProtocol = true
             url("${reposiliteUrl}/releases")
             name "Reposilite"
             credentials(PasswordCredentials) {
@@ -176,13 +191,34 @@ allprojects {
 
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
-    jvmArgs = ["-DspringAot=false"]
+project(':resource-server') {
+    dependencies {
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testImplementation 'org.apache.groovy:groovy:4.0.15'
+        testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
+        testImplementation 'org.spockframework:spock-spring:2.3-groovy-4.0'
+        testImplementation 'net.bytebuddy:byte-buddy:1.14.9'
+        testImplementation 'com.athaydes:spock-reports:2.5.1-groovy-4.0'
+    }
 }
 
-graalvmNative {
-    testSupport = false
+project(':authentication-components') {
+    dependencies {
+        api(project(':resource-server'))
+
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testImplementation 'org.apache.groovy:groovy:4.0.15'
+        testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
+        testImplementation 'org.spockframework:spock-spring:2.3-groovy-4.0'
+        testImplementation 'net.bytebuddy:byte-buddy:1.14.9'
+        testImplementation 'com.athaydes:spock-reports:2.5.1-groovy-4.0'
+    }
 }
+
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
 
 

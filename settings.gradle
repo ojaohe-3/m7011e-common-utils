@@ -1,4 +1,4 @@
-rootProject.name = 'common-utils'
+rootProject.name = 'common-m7011e.the_homeric_odyssey.authentication_components.utils'
 include "resource-server"
 include "authentication-components"
 include "common-dependencies"
