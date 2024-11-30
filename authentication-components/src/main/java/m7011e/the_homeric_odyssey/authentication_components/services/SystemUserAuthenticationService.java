@@ -1,6 +1,7 @@
-package services;
+package m7011e.the_homeric_odyssey.authentication_components.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import m7011e.the_homeric_odyssey.authentication_components.configuration.AuthenticationProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
@@ -25,21 +26,13 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 @Service
-@PropertySource("classpath:security.yaml")
 public class SystemUserAuthenticationService {
 
     private final RestTemplate restTemplate;
 
     private final ObjectMapper objectMapper;
 
-    @Value("${security.authentication.system-user.username}")
-    private String systemUsername;
-
-    @Value(value = "${security.authentication.system-user.password}")
-    private String systemPassword;
-
-    @Value("${oauth2.token-uri}")
-    private String tokenUri;
+    private final AuthenticationProperties authenticationProperties;
 
     private OAuth2AccessToken currentSystemToken;
 
@@ -47,10 +40,11 @@ public class SystemUserAuthenticationService {
 
     public SystemUserAuthenticationService(
             RestTemplate restTemplate,
-            ObjectMapper objectMapper
+            ObjectMapper objectMapper, AuthenticationProperties authenticationProperties
     ) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
+        this.authenticationProperties = authenticationProperties;
     }
 
     /**
@@ -67,15 +61,18 @@ public class SystemUserAuthenticationService {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         // TODO fix for auth-server
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("grant_type", "client_credentials");
-        map.add("client_id", systemUsername);
-        map.add("client_secret", systemPassword);
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("grant_type", "refresh_token");
+        formData.add("grant_type", "password");
+        formData.add("client_id", authenticationProperties.getClientId());
+        formData.add("client_secret", authenticationProperties.getClientSecret());
+        formData.add("username", authenticationProperties.getSystemUser().getUsername());
+        formData.add("password", authenticationProperties.getSystemUser().getPassword());
 
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
 
         try {
-            String responseBody = restTemplate.postForObject(tokenUri, request, String.class);
+            String responseBody = restTemplate.postForObject(authenticationProperties.getUrl(), request, String.class);
             var responseMap = objectMapper.readValue(responseBody, Map.class);
             currentSystemToken = new OAuth2AccessToken(
                     OAuth2AccessToken.TokenType.BEARER,
@@ -147,11 +144,11 @@ public class SystemUserAuthenticationService {
 
                     @Override
                     public String getName() {
-                        return systemUsername;
+                        return authenticationProperties.getSystemUser().getUsername();
                     }
                 },
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_SYSTEM")),
-                systemUsername
+                authenticationProperties.getSystemUser().getUsername()
         );
     }
 

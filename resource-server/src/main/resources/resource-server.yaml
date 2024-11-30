@@ -1,0 +1,2 @@
+resource-server:
+  client-id: ${KEYCLOAK_CLIENT_ID:auth-server-client}
