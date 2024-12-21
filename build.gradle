@@ -35,7 +35,7 @@ scmVersion {
 }
 
 group = 'm7011e.the-homeric-odyssey'
-project.version = scmVersion.version + '13'
+project.version = scmVersion.version
 
 subprojects.each {
     check.dependsOn("${it.name}:check")
