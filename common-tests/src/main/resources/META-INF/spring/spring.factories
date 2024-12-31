@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+m7011e.the_homeric_odyssey.configuration.TestContainersConfiguration

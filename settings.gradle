@@ -2,4 +2,5 @@ rootProject.name = 'common-m7011e.the_homeric_odyssey.authentication_components.
 include "resource-server"
 include "authentication-components"
 include "common-dependencies"
+include 'common-tests'
 

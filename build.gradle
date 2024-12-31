@@ -215,6 +215,22 @@ project(':authentication-components') {
     }
 }
 
+project(':common-tests'){
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+        api group: 'org.springframework', name: 'spring-test', version: '6.2.1'
+        api 'org.springframework.boot:spring-boot-starter-test'
+        api 'org.spockframework:spock-core:2.3-groovy-4.0'
+        api 'org.spockframework:spock-spring:2.3-groovy-4.0'
+        api group: 'org.testcontainers', name: 'testcontainers', version: '1.20.4'
+        api 'org.testcontainers:postgresql:1.20.4'
+        api 'org.testcontainers:spock:1.19.3'
+    }
+}
+
 
 tasks.named('test') {
     useJUnitPlatform()
