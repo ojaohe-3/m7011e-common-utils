@@ -62,7 +62,7 @@ public class SystemUserAuthenticationService {
 
         // TODO fix for auth-server
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("grant_type", "refresh_token");
+        formData.add("scope", "openid");
         formData.add("grant_type", "password");
         formData.add("client_id", authenticationProperties.getClientId());
         formData.add("client_secret", authenticationProperties.getClientSecret());
