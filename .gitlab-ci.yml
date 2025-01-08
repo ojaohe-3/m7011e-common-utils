@@ -1,0 +1,47 @@
+# .gitlab-ci.yml
+#
+
+# Gradle docker image
+image: gradle:8.10.2-jdk21
+
+variables:
+  DOCKER_DRIVER: overlay2
+  PROJECT_NAME: "vendor-store-common-utils"
+  DOCKER_IMAGE: "vendor-store-common-utils-docker"
+  REPOSILITE_URL: "https://files.jeberg.dev"
+  REPOSILITE_USER: "cicd"
+  REPOSILITE_TOKEN: "PGo1ADXdAS+KF4cwECY66TJIE2hmbteayWiIyGjjpeYNOh9RQoGuMfP18hBW1tST"
+
+stages:
+  - build
+  - docker-build
+  - deploy
+
+build-app:
+  stage: build
+  script:
+    - echo "Building vendor-store-common-utils..."
+    - gradle clean build -x test -P reposiliteUrl=$REPOSILITE_URL -P reposiliteUser=$REPOSILITE_USER -P reposiliteSecret=$REPOSILITE_TOKEN
+  artifacts:
+    paths:
+      - build/libs/*.jar
+
+docker_build:
+  stage: docker-build
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - echo "Building docker image..."
+    - export NAME="registry.ludd.ltu.se/m7011e/common-utils/common-utils:latest"
+    - docker build -t "$CI_REGISTRY_IMAGE/$DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA" .
+    - docker push "$CI_REGISTRY_IMAGE/$DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: always
+
+
