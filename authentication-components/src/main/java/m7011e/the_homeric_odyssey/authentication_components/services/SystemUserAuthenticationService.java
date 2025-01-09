@@ -2,8 +2,6 @@ package m7011e.the_homeric_odyssey.authentication_components.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import m7011e.the_homeric_odyssey.authentication_components.configuration.AuthenticationProperties;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;

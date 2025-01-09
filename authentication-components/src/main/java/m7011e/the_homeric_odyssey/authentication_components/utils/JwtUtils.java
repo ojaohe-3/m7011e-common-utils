@@ -12,14 +12,14 @@ public class JwtUtils {
     public boolean jwtHasWriteRole(String role, Collection<GrantedAuthority> roles) {
         String matchRole = role.toUpperCase();
         return roles.stream().anyMatch(r -> r.getAuthority().equals(matchRole))
-                && roles.stream().anyMatch(r -> r.getAuthority().equals("WRITE"));
+                && roles.stream().anyMatch(r -> r.getAuthority().equals("ROLE_WRITE"));
     }
 
 
     public boolean jwtHasReadRole(String role, Collection<GrantedAuthority> roles) {
         String matchRole = role.toUpperCase();
         return roles.stream().anyMatch(r -> r.getAuthority().equals(matchRole))
-                && roles.stream().anyMatch(r -> r.getAuthority().equals("READ"));
+                && roles.stream().anyMatch(r -> r.getAuthority().equals("ROLE_READ"));
 
     }
 }
